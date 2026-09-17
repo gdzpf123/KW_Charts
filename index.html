@@ -1,125 +1,456 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <meta name="theme-color" content="#f7f8fa">
+
+    <!-- ==============================
+         页面基础信息
+         ============================== -->
+
     <title>门店经营数据</title>
+
+    <meta name="description"
+          content="查看门店营业收入、毛利率、净利润及历史经营数据">
+
+
+    <!-- ==============================
+         微信/网页分享信息
+         ============================== -->
+
+    <!-- 分享标题 -->
+    <meta property="og:title"
+          content="门店经营数据">
+
+    <!-- 分享描述 -->
+    <meta property="og:description"
+          content="查看门店营业收入、毛利率、净利润及历史经营数据">
+
+    <!-- 分享缩略图
+         修改成你上传到帽子云的图片地址 -->
+    <meta property="og:image"
+          content="https://l1li0f7ys-kwcharts-35p12ts.maozi.io/share.png">
+
+    <!-- 网页类型 -->
+    <meta property="og:type"
+          content="website">
+
+    <!-- 当前网页地址
+         修改成你的帽子云 H5 地址 -->
+    <meta property="og:url"
+          content="https://l1li0f7ys-kwcharts-35p12ts.maozi.io/">
+
+
+    <!-- ==============================
+         CSS
+         ============================== -->
+
     <link rel="stylesheet" href="css/style.css">
+
+
+    <!-- ==============================
+         ECharts
+         ============================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
 </head>
+
+
 <body>
+
 <div class="app">
+
+    <!-- ==============================
+         顶部导航
+         ============================== -->
+
     <header class="topbar">
+
         <div>
-            <div class="eyebrow">STORE REPORT</div>
-            <h1>门店经营数据</h1>
+
+            <div class="eyebrow">
+                STORE REPORT
+            </div>
+
+            <h1>
+                门店经营数据
+            </h1>
+
         </div>
-        <button id="refreshBtn" class="icon-btn" aria-label="刷新">↻</button>
+
+        <button
+                id="refreshBtn"
+                class="icon-btn"
+                aria-label="刷新">
+
+            ↻
+
+        </button>
+
     </header>
 
+
+    <!-- ==============================
+         页面主体
+         ============================== -->
+
     <main class="content">
-        <section id="page-home" class="page active">
+
+
+        <!-- ==============================
+             首页
+             ============================== -->
+
+        <section
+                id="page-home"
+                class="page active">
+
+
+            <!-- 门店 / 月份选择 -->
+
             <div class="selector-card">
+
                 <div class="selector-group">
-                    <label>门店</label>
+
+                    <label>
+                        门店
+                    </label>
+
                     <select id="storeSelect"></select>
+
                 </div>
+
+
                 <div class="selector-group">
-                    <label>月份</label>
+
+                    <label>
+                        月份
+                    </label>
+
                     <select id="monthSelect"></select>
+
                 </div>
+
             </div>
 
-            <div id="summaryCards" class="summary-grid"></div>
+
+            <!-- 数据概览 -->
+
+            <div
+                    id="summaryCards"
+                    class="summary-grid">
+            </div>
+
+
+            <!-- ==============================
+                 营业收入趋势
+                 ============================== -->
 
             <section class="card chart-card">
+
                 <div class="card-title">
+
                     <div>
-                        <h2>营业收入趋势</h2>
-                        <p>近 6 个月</p>
+
+                        <h2>
+                            营业收入趋势
+                        </h2>
+
+                        <p>
+                            近 6 个月
+                        </p>
+
                     </div>
+
                 </div>
-                <div id="revenueTrend" class="chart"></div>
+
+
+                <div
+                        id="revenueTrend"
+                        class="chart">
+                </div>
+
             </section>
 
-            <section class="card chart-card">
-                <div class="card-title">
-                    <div>
-                        <h2>门店营业收入</h2>
-                        <p id="storeCompareSubtitle">当月各门店对比</p>
-                    </div>
-                </div>
-                <div id="storeCompare" class="chart"></div>
-            </section>
+
+            <!-- ==============================
+                 门店营业收入对比
+                 ============================== -->
 
             <section class="card chart-card">
+
                 <div class="card-title">
+
                     <div>
-                        <h2>经营收入构成</h2>
-                        <p id="compositionSubtitle">当前门店当月数据</p>
+
+                        <h2>
+                            门店营业收入
+                        </h2>
+
+                        <p id="storeCompareSubtitle">
+                            当月各门店对比
+                        </p>
+
                     </div>
+
                 </div>
-                <div id="composition" class="chart pie-chart"></div>
+
+
+                <div
+                        id="storeCompare"
+                        class="chart">
+                </div>
+
             </section>
+
+
+            <!-- ==============================
+                 经营收入构成
+                 ============================== -->
+
+            <section class="card chart-card">
+
+                <div class="card-title">
+
+                    <div>
+
+                        <h2>
+                            经营收入构成
+                        </h2>
+
+                        <p id="compositionSubtitle">
+                            当前门店当月数据
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                        id="composition"
+                        class="chart pie-chart">
+                </div>
+
+            </section>
+
+
         </section>
 
-        <section id="page-history" class="page">
+
+        <!-- ==============================
+             历史月结
+             ============================== -->
+
+        <section
+                id="page-history"
+                class="page">
+
+
             <div class="page-heading">
-                <h2>历史月结</h2>
-                <p>查看各门店历史经营数据</p>
+
+                <h2>
+                    历史月结
+                </h2>
+
+                <p>
+                    查看各门店历史经营数据
+                </p>
+
             </div>
-            <div id="historyList" class="history-list"></div>
+
+
+            <div
+                    id="historyList"
+                    class="history-list">
+            </div>
+
+
         </section>
 
-        <section id="page-analysis" class="page">
+
+        <!-- ==============================
+             经营分析
+             ============================== -->
+
+        <section
+                id="page-analysis"
+                class="page">
+
+
             <div class="page-heading">
-                <h2>经营分析</h2>
-                <p id="analysisSubtitle">趋势与利润变化</p>
+
+                <h2>
+                    经营分析
+                </h2>
+
+                <p id="analysisSubtitle">
+                    趋势与利润变化
+                </p>
+
             </div>
 
-            <section class="card chart-card">
-                <div class="card-title">
-                    <div>
-                        <h2>净利润趋势</h2>
-                        <p>近 6 个月</p>
-                    </div>
-                </div>
-                <div id="profitTrend" class="chart"></div>
-            </section>
+
+            <!-- ==============================
+                 净利润趋势
+                 ============================== -->
 
             <section class="card chart-card">
+
                 <div class="card-title">
+
                     <div>
-                        <h2>毛利率趋势</h2>
-                        <p>近 6 个月</p>
+
+                        <h2>
+                            净利润趋势
+                        </h2>
+
+                        <p>
+                            近 6 个月
+                        </p>
+
                     </div>
+
                 </div>
-                <div id="marginTrend" class="chart"></div>
+
+
+                <div
+                        id="profitTrend"
+                        class="chart">
+                </div>
+
             </section>
 
-            <section id="analysisMetrics" class="analysis-metrics"></section>
+
+            <!-- ==============================
+                 毛利率趋势
+                 ============================== -->
+
+            <section class="card chart-card">
+
+                <div class="card-title">
+
+                    <div>
+
+                        <h2>
+                            毛利率趋势
+                        </h2>
+
+                        <p>
+                            近 6 个月
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                        id="marginTrend"
+                        class="chart">
+                </div>
+
+            </section>
+
+
+            <!-- ==============================
+                 分析指标
+                 ============================== -->
+
+            <section
+                    id="analysisMetrics"
+                    class="analysis-metrics">
+            </section>
+
+
         </section>
+
+
     </main>
 
+
+    <!-- ==============================
+         底部导航
+         ============================== -->
+
     <nav class="bottom-nav">
-        <button class="nav-item active" data-page="home">
-            <span class="nav-icon">⌂</span>
-            <span>首页</span>
+
+
+        <button
+                class="nav-item active"
+                data-page="home">
+
+            <span class="nav-icon">
+                ⌂
+            </span>
+
+            <span>
+                首页
+            </span>
+
         </button>
-        <button class="nav-item" data-page="history">
-            <span class="nav-icon">▤</span>
-            <span>历史</span>
+
+
+        <button
+                class="nav-item"
+                data-page="history">
+
+            <span class="nav-icon">
+                ▤
+            </span>
+
+            <span>
+                历史
+            </span>
+
         </button>
-        <button class="nav-item" data-page="analysis">
-            <span class="nav-icon">⌁</span>
-            <span>分析</span>
+
+
+        <button
+                class="nav-item"
+                data-page="analysis">
+
+            <span class="nav-icon">
+                ⌁
+            </span>
+
+            <span>
+                分析
+            </span>
+
         </button>
+
+
     </nav>
+
 </div>
 
-<div id="toast" class="toast"></div>
+
+<!-- ==============================
+     Toast
+     ============================== -->
+
+<div
+        id="toast"
+        class="toast">
+</div>
+
+
+<!-- ==============================
+     JavaScript
+     ============================== -->
+
 <script src="js/data.js"></script>
+
 <script src="js/app.js"></script>
+
+
 </body>
+
 </html>
