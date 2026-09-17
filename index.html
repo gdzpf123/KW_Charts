@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的第一个网页</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f4f8;
+        }
+        .card {
+            text-align: center;
+            background: white;
+            padding: 40px 60px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #555;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 24px;
+            font-size: 16px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1558b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>你好，世界！</h1>
+        <p>这是我的第一个网页，已经成功部署啦 🎉</p>
+        <button onclick="alert('你点击了按钮！')">点我试试</button>
+    </div>
+</body>
+</html>
