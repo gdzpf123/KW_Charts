@@ -1,417 +1,1166 @@
-/*
- * 月结数据文件
+/**
+ * =========================================================
+ * 数据管理
+ * =========================================================
  *
- * 字段说明：
+ * TXT 文件目录：
  *
- * totalRevenue       总营业额
- * totalDiscount      总优惠减免
- * revenue            营业收入
- * totalFee           总手续费
- * operatingIncome   经营实收
+ * data/
+ * ├── 西乡店/
+ * │   ├── 2026-07.txt
+ * │   └── 2026-08.txt
+ * │
+ * ├── 碧海湾店/
+ * │   ├── 2026-07.txt
+ * │   └── 2026-08.txt
+ * │
+ * └── ...
  *
- * foodPayment       食材货款
- * nonFoodPayment    非食材货款
- * supplierPayment   货佬款项合计
- *
- * grossProfit       毛利
- * grossMargin       毛利率
- *
- * fixedExpense      固定支出
- * otherExpense      其他支出
- * hqExpense         总公司运营支出
- *
- * netProfit         净利润
- * netMargin         净利率
  */
 
 
-const STORE_DATA = [
+/**
+ * 当前已经加载的数据
+ */
+let STORE_DATA = [];
 
-    // ==============================
-    // 西乡店
-    // ==============================
 
-    {
-        store: "西乡店",
-        month: "2026-08",
+/**
+ * =========================================================
+ * 获取 TXT 文件路径
+ * =========================================================
+ */
+function getDataFilePath(store, month) {
 
-        totalRevenue: 800000,
-        totalDiscount: 38893.88,
-        revenue: 761106.12,
-        totalFee: 20000,
-        operatingIncome: 741106.12,
+    return `data/${store}/${month}.txt`;
 
-        foodPayment: 280000,
-        nonFoodPayment: 32500,
-        supplierPayment: 312500,
+}
 
-        grossProfit: 428606.12,
-        grossMargin: 57.90,
 
-        fixedExpense: 62000,
-        otherExpense: 28000,
-        hqExpense: 30000,
+/**
+ * =========================================================
+ * 读取 TXT 文件
+ * =========================================================
+ */
+async function loadStoreData(store, month) {
 
-        netProfit: 308606.12,
-        netMargin: 41.64
-    },
+    const path =
+        getDataFilePath(
+            store,
+            month
+        );
 
 
-    {
-        store: "西乡店",
-        month: "2026-07",
+    console.log(
+        "开始读取数据：",
+        path
+    );
 
-        totalRevenue: 740000,
-        totalDiscount: 34800,
-        revenue: 705200,
-        totalFee: 18000,
-        operatingIncome: 687200,
 
-        foodPayment: 265000,
-        nonFoodPayment: 31000,
-        supplierPayment: 296000,
+    try {
 
-        grossProfit: 391200,
-        grossMargin: 56.92,
+        const response =
+            await fetch(path);
 
-        fixedExpense: 62000,
-        otherExpense: 27000,
-        hqExpense: 30000,
 
-        netProfit: 272200,
-        netMargin: 39.61
-    },
+        if (!response.ok) {
 
+            throw new Error(
+                `TXT 文件读取失败：${response.status}`
+            );
 
-    {
-        store: "西乡店",
-        month: "2026-06",
+        }
 
-        totalRevenue: 720000,
-        totalDiscount: 31500,
-        revenue: 688500,
-        totalFee: 18000,
-        operatingIncome: 670500,
 
-        foodPayment: 257000,
-        nonFoodPayment: 30000,
-        supplierPayment: 287000,
+        const text =
+            await response.text();
 
-        grossProfit: 383500,
-        grossMargin: 57.20,
 
-        fixedExpense: 62000,
-        otherExpense: 26000,
-        hqExpense: 30000,
+        console.log(
+            "TXT 原始数据：",
+            text
+        );
 
-        netProfit: 265500,
-        netMargin: 39.60
-    },
 
+        const record =
+            parseStoreTxt(
+                text,
+                store,
+                month
+            );
 
-    {
-        store: "西乡店",
-        month: "2026-05",
 
-        totalRevenue: 675000,
-        totalDiscount: 32700,
-        revenue: 642300,
-        totalFee: 17000,
-        operatingIncome: 625300,
+        if (!record) {
 
-        foodPayment: 245000,
-        nonFoodPayment: 30000,
-        supplierPayment: 275000,
+            throw new Error(
+                "TXT 数据解析失败"
+            );
 
-        grossProfit: 350300,
-        grossMargin: 56.02,
+        }
 
-        fixedExpense: 62000,
-        otherExpense: 25000,
-        hqExpense: 30000,
 
-        netProfit: 233300,
-        netMargin: 37.31
-    },
+        console.log(
+            "解析后的数据：",
+            record
+        );
 
 
-    {
-        store: "西乡店",
-        month: "2026-04",
+        return record;
 
-        totalRevenue: 650000,
-        totalDiscount: 34200,
-        revenue: 615800,
-        totalFee: 16000,
-        operatingIncome: 599800,
 
-        foodPayment: 239000,
-        nonFoodPayment: 30000,
-        supplierPayment: 269000,
+    } catch (error) {
 
-        grossProfit: 330800,
-        grossMargin: 55.15,
+        console.error(
+            "读取门店数据失败：",
+            error
+        );
 
-        fixedExpense: 62000,
-        otherExpense: 24000,
-        hqExpense: 30000,
 
-        netProfit: 214800,
-        netMargin: 35.81
-    },
+        throw error;
 
-
-    {
-        store: "西乡店",
-        month: "2026-03",
-
-        totalRevenue: 630000,
-        totalDiscount: 31400,
-        revenue: 598600,
-        totalFee: 15000,
-        operatingIncome: 583600,
-
-        foodPayment: 231000,
-        nonFoodPayment: 30000,
-        supplierPayment: 261000,
-
-        grossProfit: 322600,
-        grossMargin: 55.28,
-
-        fixedExpense: 62000,
-        otherExpense: 23000,
-        hqExpense: 30000,
-
-        netProfit: 207600,
-        netMargin: 35.57
-    },
-
-
-    // ==============================
-    // 塘头店
-    // ==============================
-
-    {
-        store: "塘头店",
-        month: "2026-08",
-
-        totalRevenue: 610000,
-        totalDiscount: 29800,
-        revenue: 580200,
-        totalFee: 15000,
-        operatingIncome: 565200,
-
-        foodPayment: 220000,
-        nonFoodPayment: 30000,
-        supplierPayment: 250000,
-
-        grossProfit: 315200,
-        grossMargin: 55.77,
-
-        fixedExpense: 50000,
-        otherExpense: 22000,
-        hqExpense: 28000,
-
-        netProfit: 215200,
-        netMargin: 38.07
-    },
-
-
-    {
-        store: "塘头店",
-        month: "2026-07",
-
-        totalRevenue: 580000,
-        totalDiscount: 27200,
-        revenue: 552800,
-        totalFee: 14000,
-        operatingIncome: 538800,
-
-        foodPayment: 212000,
-        nonFoodPayment: 30000,
-        supplierPayment: 242000,
-
-        grossProfit: 296800,
-        grossMargin: 55.09,
-
-        fixedExpense: 50000,
-        otherExpense: 21000,
-        hqExpense: 28000,
-
-        netProfit: 197800,
-        netMargin: 36.71
-    },
-
-
-    // ==============================
-    // 石龙仔店
-    // ==============================
-
-    {
-        store: "石龙仔店",
-        month: "2026-08",
-
-        totalRevenue: 680000,
-        totalDiscount: 29700,
-        revenue: 650300,
-        totalFee: 16000,
-        operatingIncome: 634300,
-
-        foodPayment: 249000,
-        nonFoodPayment: 30000,
-        supplierPayment: 279000,
-
-        grossProfit: 355300,
-        grossMargin: 56.02,
-
-        fixedExpense: 56000,
-        otherExpense: 24000,
-        hqExpense: 28000,
-
-        netProfit: 247300,
-        netMargin: 38.97
-    },
-
-
-    {
-        store: "石龙仔店",
-        month: "2026-07",
-
-        totalRevenue: 650000,
-        totalDiscount: 29900,
-        revenue: 620100,
-        totalFee: 15000,
-        operatingIncome: 605100,
-
-        foodPayment: 238000,
-        nonFoodPayment: 30000,
-        supplierPayment: 268000,
-
-        grossProfit: 337100,
-        grossMargin: 55.71,
-
-        fixedExpense: 56000,
-        otherExpense: 23000,
-        hqExpense: 28000,
-
-        netProfit: 230100,
-        netMargin: 38.02
-    },
-
-
-    // ==============================
-    // 沙井店
-    // ==============================
-
-    {
-        store: "沙井店",
-        month: "2026-08",
-
-        totalRevenue: 545000,
-        totalDiscount: 24400,
-        revenue: 520600,
-        totalFee: 14000,
-        operatingIncome: 506600,
-
-        foodPayment: 196000,
-        nonFoodPayment: 30000,
-        supplierPayment: 226000,
-
-        grossProfit: 280600,
-        grossMargin: 55.39,
-
-        fixedExpense: 48000,
-        otherExpense: 21000,
-        hqExpense: 26000,
-
-        netProfit: 185600,
-        netMargin: 36.64
-    },
-
-
-    // ==============================
-    // 碧海湾店
-    // ==============================
-
-    {
-        store: "碧海湾店",
-        month: "2026-08",
-
-        totalRevenue: 730000,
-        totalDiscount: 29500,
-        revenue: 700500,
-        totalFee: 17000,
-        operatingIncome: 683500,
-
-        foodPayment: 254000,
-        nonFoodPayment: 30000,
-        supplierPayment: 284000,
-
-        grossProfit: 399500,
-        grossMargin: 58.45,
-
-        fixedExpense: 58000,
-        otherExpense: 24000,
-        hqExpense: 30000,
-
-        netProfit: 287500,
-        netMargin: 42.06
-    },
-
-
-    {
-        store: "碧海湾店",
-        month: "2026-07",
-
-        totalRevenue: 700000,
-        totalDiscount: 26800,
-        revenue: 673200,
-        totalFee: 16000,
-        operatingIncome: 657200,
-
-        foodPayment: 247000,
-        nonFoodPayment: 30000,
-        supplierPayment: 277000,
-
-        grossProfit: 380200,
-        grossMargin: 57.86,
-
-        fixedExpense: 58000,
-        otherExpense: 23000,
-        hqExpense: 30000,
-
-        netProfit: 269200,
-        netMargin: 40.96
-    },
-
-
-    // ==============================
-    // 桃源居店
-    // ==============================
-
-    {
-        store: "桃源居店",
-        month: "2026-08",
-
-        totalRevenue: 505000,
-        totalDiscount: 24200,
-        revenue: 480800,
-        totalFee: 13000,
-        operatingIncome: 467800,
-
-        foodPayment: 185000,
-        nonFoodPayment: 30000,
-        supplierPayment: 215000,
-
-        grossProfit: 252800,
-        grossMargin: 54.04,
-
-        fixedExpense: 47000,
-        otherExpense: 20000,
-        hqExpense: 25000,
-
-        netProfit: 160800,
-        netMargin: 34.38
     }
 
-];
+}
+
+
+/**
+ * =========================================================
+ * 从 TXT 中读取某一项「本月」数据
+ *
+ * 例如：
+ *
+ * 总营业额(+)本月 1019173.38,上月...
+ *
+ * 获取：
+ *
+ * 1019173.38
+ *
+ * =========================================================
+ */
+function getCurrentValue(text, name) {
+
+    const escapedName =
+        name.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        );
+
+
+    const regex =
+        new RegExp(
+            escapedName +
+            "本月\\s*([-+]?\\d+(?:\\.\\d+)?)"
+        );
+
+
+    const match =
+        text.match(regex);
+
+
+    if (!match) {
+
+        console.warn(
+            "没有找到数据：",
+            name
+        );
+
+
+        return 0;
+
+    }
+
+
+    return Number(
+        match[1]
+    );
+
+}
+
+/**
+ * =========================================================
+ * 解析供应商明细
+ *
+ * TXT 格式：
+ *
+ * 食材货佬款项
+ * 豆腐供应商,5940.00
+ * 广园丰食品,400.00
+ * ...
+ * 小计,272269.06
+ *
+ * 非食材货佬款项
+ * 诚伟纸塑,3339.00
+ * ...
+ * 小计,24185.00
+ * =========================================================
+ */
+function getSupplierDetails(text) {
+
+    const result = {
+
+        food: [],
+
+        nonFood: []
+
+    };
+
+
+    /**
+     * -----------------------------------------------------
+     * 解析某一个供应商区域
+     * -----------------------------------------------------
+     */
+    function parseSection(startTitle, endTitle) {
+
+        const startIndex =
+            text.indexOf(startTitle);
+
+
+        if (startIndex === -1) {
+
+            return [];
+
+        }
+
+
+        let endIndex =
+            text.length;
+
+
+        if (endTitle) {
+
+            const tempIndex =
+                text.indexOf(
+                    endTitle,
+                    startIndex + startTitle.length
+                );
+
+
+            if (tempIndex !== -1) {
+
+                endIndex = tempIndex;
+
+            }
+
+        }
+
+
+        const section =
+            text.substring(
+                startIndex + startTitle.length,
+                endIndex
+            );
+
+
+        const lines =
+            section.split(/\r?\n/);
+
+
+        const list = [];
+
+
+        lines.forEach(line => {
+
+            line =
+                line.trim();
+
+
+            if (!line) {
+
+                return;
+
+            }
+
+
+            const parts =
+                line.split(",");
+
+
+            if (parts.length < 2) {
+
+                return;
+
+            }
+
+
+            const name =
+                parts[0].trim();
+
+
+            const amount =
+                Number(
+                    parts[1].trim()
+                );
+
+
+            if (!name) {
+
+                return;
+
+            }
+
+
+            if (
+                name === "小计" ||
+                name === "总计"
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                Number.isNaN(amount)
+            ) {
+
+                return;
+
+            }
+
+
+            list.push({
+
+                name,
+
+                amount
+
+            });
+
+        });
+
+
+        return list;
+
+    }
+
+
+    /**
+     * 食材供应商
+     */
+    result.food =
+        parseSection(
+            "食材货佬款项",
+            "非食材货佬款项"
+        );
+
+
+    /**
+     * 非食材供应商
+     *
+     * 注意：
+     *
+     * 这里不是「非食材耗材」，
+     * 而是「非食材货佬款项」。
+     */
+    result.nonFood =
+        parseSection(
+            "非食材货佬款项",
+            "下面是耗材的金额数据"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 计算合计
+     * -----------------------------------------------------
+     */
+
+    result.foodTotal =
+        result.food.reduce(
+            (sum, item) =>
+                sum + item.amount,
+            0
+        );
+
+
+    result.nonFoodTotal =
+        result.nonFood.reduce(
+            (sum, item) =>
+                sum + item.amount,
+            0
+        );
+
+
+    result.total =
+        result.foodTotal +
+        result.nonFoodTotal;
+
+
+    return result;
+
+}
+
+
+/**
+ * =========================================================
+ * 从 TXT 中读取货佬款项「小计」
+ *
+ * TXT 格式：
+ *
+ * 食材货佬款项
+ * 豆腐供应商,5940.00
+ * ...
+ * 小计,272269.06
+ *
+ * 非食材货佬款项
+ * 诚伟纸塑,3339.00
+ * ...
+ * 小计,24185.00
+ *
+ * =========================================================
+ */
+function getSupplierSubtotal(
+    text,
+    sectionName
+) {
+
+    /**
+     * 找到对应的区块
+     *
+     * 例如：
+     *
+     * 食材货佬款项
+     * ...
+     * 小计,272269.06
+     *
+     * 截止到下一个：
+     *
+     * 非食材货佬款项
+     *
+     * 或：
+     *
+     * 耗材
+     *
+     * 或文本结束
+     */
+
+    const escapedSectionName =
+        sectionName.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        );
+
+
+    const regex =
+        new RegExp(
+            escapedSectionName +
+            "[\\s\\S]*?小计\\s*,\\s*([-+]?\\d+(?:\\.\\d+)?)",
+            "i"
+        );
+
+
+    const match =
+        text.match(regex);
+
+
+    if (!match) {
+
+        console.warn(
+            "没有找到货佬款项小计：",
+            sectionName
+        );
+
+
+        return 0;
+
+    }
+
+
+    return Number(
+        match[1]
+    );
+
+}
+
+/**
+ * =========================================================
+ * 解析非食材耗材明细
+ * =========================================================
+ */
+function getConsumableDetails(text) {
+
+    const result = [];
+
+
+    const startTitle =
+        "下面是耗材的金额数据";
+
+
+    const startIndex =
+        text.indexOf(startTitle);
+
+
+    if (startIndex === -1) {
+
+        console.warn(
+            "没有找到耗材数据"
+        );
+
+        return result;
+
+    }
+
+
+    const section =
+        text.substring(
+            startIndex + startTitle.length
+        );
+
+
+    const lines =
+        section.split(/\r?\n/);
+
+
+    lines.forEach(line => {
+
+        line =
+            line.trim();
+
+
+        if (!line) {
+
+            return;
+
+        }
+
+
+        const parts =
+            line.split(",");
+
+
+        /**
+         * 格式：
+         *
+         * 名称,
+         * 类型,
+         * 日期,
+         * 单号,
+         * 金额
+         */
+        if (parts.length < 5) {
+
+            return;
+
+        }
+
+
+        const name =
+            parts[0].trim();
+
+
+        const category =
+            parts[1].trim();
+
+
+        const date =
+            parts[2].trim();
+
+
+        const orderNo =
+            parts[3].trim();
+
+
+        const amount =
+            Number(
+                parts[4].trim()
+            );
+
+
+        if (!name) {
+
+            return;
+
+        }
+
+
+        if (
+            name === "总计"
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            Number.isNaN(amount)
+        ) {
+
+            return;
+
+        }
+
+
+        result.push({
+
+            name,
+
+            category,
+
+            date,
+
+            orderNo,
+
+            amount
+
+        });
+
+    });
+
+
+    return result;
+
+}
+
+/**
+ * =========================================================
+ * 解析 TXT
+ * =========================================================
+ */
+function parseStoreTxt(
+    text,
+    store,
+    month
+) {
+
+    /**
+     * -----------------------------------------------------
+     * 基础经营数据
+     * -----------------------------------------------------
+     */
+
+    const totalRevenue =
+        getCurrentValue(
+            text,
+            "总营业额(+)"
+        );
+
+
+    const totalDiscount =
+        getCurrentValue(
+            text,
+            "总优惠减免(-)"
+        );
+
+
+    const operatingIncome =
+        getCurrentValue(
+            text,
+            "经营实收"
+        );
+
+
+    const totalFee =
+        getCurrentValue(
+            text,
+            "总手续费/服务费(-)"
+        );
+
+
+    const hqExpense =
+        getCurrentValue(
+            text,
+            "总公司运营支出(-)"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 固定支出
+     * -----------------------------------------------------
+     */
+
+    const rent =
+        getCurrentValue(
+            text,
+            "店铺租金"
+        );
+
+
+    const propertyFee =
+        getCurrentValue(
+            text,
+            "物业服务费"
+        );
+
+
+    const waterElectricity =
+        getCurrentValue(
+            text,
+            "店铺水电费"
+        );
+
+
+    const dormitoryRent =
+        getCurrentValue(
+            text,
+            "宿舍房租"
+        );
+
+
+    const salary =
+        getCurrentValue(
+            text,
+            "员工工资"
+        );
+
+
+    const socialSecurity =
+        getCurrentValue(
+            text,
+            "员工社保"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 耗材
+     * -----------------------------------------------------
+     */
+
+    const consumableExpense =
+        getCurrentValue(
+            text,
+            "非食材 耗材 支出"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 货佬款项总额
+     *
+     * 例如：
+     *
+     * 货佬款项(-)本月 296454.09
+     * -----------------------------------------------------
+     */
+
+    const supplierPayment =
+        getCurrentValue(
+            text,
+            "货佬款项(-)"
+        );
+
+    const supplierDetails =
+        getSupplierDetails(text);
+
+    const consumableDetails =
+    getConsumableDetails(text);
+
+
+    /**
+     * -----------------------------------------------------
+     * 食材货佬款项
+     *
+     * 例如：
+     *
+     * 食材货佬款项
+     * ...
+     * 小计,272269.06
+     * -----------------------------------------------------
+     */
+
+    const foodPayment =
+        getSupplierSubtotal(
+            text,
+            "食材货佬款项"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 非食材货佬款项
+     *
+     * 例如：
+     *
+     * 非食材货佬款项
+     * ...
+     * 小计,24185.00
+     * -----------------------------------------------------
+     */
+
+    const nonFoodPayment =
+        getSupplierSubtotal(
+            text,
+            "非食材货佬款项"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 校验货佬款项
+     *
+     * 食材 + 非食材
+     *
+     * 应该等于：
+     *
+     * 货佬款项总额
+     *
+     * -----------------------------------------------------
+     */
+
+    const supplierPaymentDetail =
+        foodPayment +
+        nonFoodPayment;
+
+
+    console.log(
+        "========== 货佬款项解析 =========="
+    );
+
+
+    console.log(
+        "食材货佬款项：",
+        foodPayment
+    );
+
+
+    console.log(
+        "非食材货佬款项：",
+        nonFoodPayment
+    );
+
+
+    console.log(
+        "货佬款项明细合计：",
+        supplierPaymentDetail
+    );
+
+
+    console.log(
+        "货佬款项总额：",
+        supplierPayment
+    );
+
+
+    if (
+        Math.abs(
+            supplierPaymentDetail -
+            supplierPayment
+        ) > 0.01
+    ) {
+
+        console.warn(
+            "⚠️ 货佬款项明细合计与总额不一致：",
+            supplierPaymentDetail,
+            supplierPayment
+        );
+
+    }
+
+
+    /**
+     * -----------------------------------------------------
+     * 净利润
+     * -----------------------------------------------------
+     */
+
+    const netProfit =
+        getCurrentValue(
+            text,
+            "净利润"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 毛利率
+     * -----------------------------------------------------
+     */
+
+    const grossMargin =
+        getCurrentValue(
+            text,
+            "毛利率(仅食材)"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 净利率
+     * -----------------------------------------------------
+     */
+
+    const netMargin =
+        getCurrentValue(
+            text,
+            "净利率"
+        );
+
+
+    /**
+     * -----------------------------------------------------
+     * 营业收入
+     *
+     * 经营实收 - 总手续费
+     *
+     * -----------------------------------------------------
+     */
+
+    const revenue =
+        operatingIncome -
+        totalFee;
+
+
+    /**
+     * -----------------------------------------------------
+     * 固定支出
+     * -----------------------------------------------------
+     */
+
+    const fixedExpense =
+        rent +
+        propertyFee +
+        waterElectricity +
+        dormitoryRent +
+        salary +
+        socialSecurity;
+
+
+    /**
+     * -----------------------------------------------------
+     * 返回统一数据结构
+     * -----------------------------------------------------
+     */
+
+    return {
+
+        store,
+
+        month,
+
+
+        /**
+         * =================================================
+         * 收入
+         * =================================================
+         */
+
+        totalRevenue,
+
+        totalDiscount,
+
+        revenue,
+
+        totalFee,
+
+        operatingIncome,
+
+
+        /**
+         * =================================================
+         * 会员
+         * =================================================
+         */
+
+        memberRecharge:
+            getCurrentValue(
+                text,
+                "会员充值(+)"
+            ),
+
+
+        memberConsumption:
+            getCurrentValue(
+                text,
+                "会员消费(-)"
+            ),
+
+
+        /**
+         * =================================================
+         * 货佬款项
+         * =================================================
+         *
+         * foodPayment
+         *     食材货佬款项
+         *
+         * nonFoodPayment
+         *     非食材货佬款项
+         *
+         * supplierPayment
+         *     货佬款项总额
+         *
+         */
+
+        foodPayment,
+
+        nonFoodPayment,
+
+        supplierPayment,
+        
+        //耗材明细
+        consumableDetails,
+
+    /**
+     * 供应商明细
+     */
+        supplierDetails,
+
+        /**
+         * =================================================
+         * 毛利
+         * =================================================
+         */
+
+        grossProfit:
+            operatingIncome -
+            supplierPayment,
+
+        grossMargin,
+
+
+        /**
+         * =================================================
+         * 固定支出
+         * =================================================
+         */
+
+        fixedExpense,
+
+        rent,
+
+        propertyFee,
+
+        waterElectricity,
+
+        dormitoryRent,
+
+        salary,
+
+        socialSecurity,
+
+
+        /**
+         * =================================================
+         * 其他支出
+         * =================================================
+         *
+         * 注意：
+         *
+         * 这里的耗材支出和非食材货佬款项
+         * 是两个不同的数据。
+         *
+         */
+
+        otherExpense:
+            consumableExpense,
+
+
+        consumableExpense,
+
+
+        /**
+         * =================================================
+         * 总公司运营支出
+         * =================================================
+         */
+
+        hqExpense,
+
+
+        /**
+         * =================================================
+         * 净利润
+         * =================================================
+         */
+
+        netProfit,
+
+        netMargin
+
+    };
+
+}
+
+
+/**
+ * =========================================================
+ * 获取门店历史月份
+ *
+ * 浏览器无法直接读取服务器目录，
+ * 所以暂时手工维护可用月份。
+ *
+ * 后面可以改成 manifest.json。
+ * =========================================================
+ */
+
+const STORE_MONTHS = {
+
+    "西乡店": [
+        "2026-08",
+        "2026-07",
+        "2026-06",
+        "2026-06",
+        "2026-04",
+        "2026-03",
+    ],
+    "碧海湾店": [
+        "2026-08",
+        "2026-07",
+        "2026-06",
+        "2026-06",
+        "2026-04",
+        "2026-03",
+    ],
+    "沙井店": [
+        "2026-08",
+        "2026-07",
+        "2026-06",
+        "2026-06",
+        "2026-04",
+        "2026-03",
+    ],
+    "塘头店": [
+        "2026-08",
+        "2026-07",
+        "2026-06",
+        "2026-06",
+        "2026-04",
+        "2026-03",
+    ],
+    "石龙仔店": [
+        "2026-08",
+        "2026-07",
+        "2026-06",
+        "2026-06",
+        "2026-04",
+        "2026-03",
+    ]
+};
+
+
+/**
+ * =========================================================
+ * 获取门店
+ * =========================================================
+ */
+
+function getStores() {
+
+    return Object.keys(
+        STORE_MONTHS
+    );
+
+}
+
+
+/**
+ * =========================================================
+ * 获取月份
+ * =========================================================
+ */
+
+function getMonths(store) {
+
+    return (
+        STORE_MONTHS[store] || []
+    )
+    .slice()
+    .sort()
+    .reverse();
+
+}
+
+
